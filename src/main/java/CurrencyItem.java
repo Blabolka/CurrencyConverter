@@ -1,9 +1,21 @@
 public class CurrencyItem {
+
     private int r030;
     private String txt;
     private double rate;
     private String cc;
     private String exchangedate;
+
+    // need to parse from json string because it use reflection
+    public CurrencyItem(){}
+
+    public CurrencyItem(int r030, String txt, double rate, String cc, String exchangedate) {
+        this.r030 = r030;
+        this.txt = txt;
+        this.rate = rate;
+        this.cc = cc;
+        this.exchangedate = exchangedate;
+    }
 
     public int getR030() {
         return r030;
