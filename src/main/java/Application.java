@@ -31,7 +31,7 @@ public class Application extends JFrame {
             currencies = new Currencies(Requests.getCurrencies(jsonUrl));
             currencies.sortByCC();
         } catch (IOException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Cannot get currencies info...", "Request error", JOptionPane.ERROR_MESSAGE);
         }
 
         fromComboBoxModel = new DefaultComboBoxModel<>();
@@ -53,9 +53,11 @@ public class Application extends JFrame {
             int indexTo = toComboBoxModel.getIndexOf(toComboBoxModel.getSelectedItem());
 
             try {
-                double convertibleValue = Double.parseDouble(fromValueTextField.getText());
-                double convertedValue = currencies.convertCurrency(indexFrom, indexTo, convertibleValue);
-                toValueTextField.setText(String.format("%.4f", convertedValue));
+                if (!fromValueTextField.getText().equals("")) {
+                    double convertibleValue = Double.parseDouble(fromValueTextField.getText());
+                    double convertedValue = currencies.convertCurrency(indexFrom, indexTo, convertibleValue);
+                    toValueTextField.setText(String.format("%.4f", convertedValue));
+                }
             } catch (NumberFormatException exception) {
                 JOptionPane.showMessageDialog(null, "Enter correct value!", "Incorrect value error", JOptionPane.ERROR_MESSAGE);
             }
