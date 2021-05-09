@@ -1,4 +1,16 @@
+import java.util.Objects;
+
 public class CurrencyItem {
+
+    /* Bad variable names because i have json request with format:
+    * {
+    *   r030: 111 // some currency identifier from service where i get info
+    *   txt: "Some currency text"
+    *   rate: 25.5
+    *   cc: "SCC" // currency code by country
+    *   exchangedate: "01.01.2020"
+    * }
+    * For working Jackson json parsing library i need to keep variable names the same as in json */
 
     private int r030;
     private String txt;
@@ -55,6 +67,23 @@ public class CurrencyItem {
 
     public void setExchangedate(String exchangedate) {
         this.exchangedate = exchangedate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CurrencyItem item = (CurrencyItem) o;
+        return r030 == item.r030 &&
+                Double.compare(item.rate, rate) == 0 &&
+                Objects.equals(txt, item.txt) &&
+                Objects.equals(cc, item.cc) &&
+                Objects.equals(exchangedate, item.exchangedate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(r030, txt, rate, cc, exchangedate);
     }
 
     @Override

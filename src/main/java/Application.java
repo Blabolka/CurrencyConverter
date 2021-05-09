@@ -7,7 +7,9 @@ import java.util.ArrayList;
 public class Application extends JFrame {
 
     private Currencies currencies;
+
     private JPanel contentPane;
+    private JButton refreshButton;
     private JComboBox<String> fromComboBox;
     private DefaultComboBoxModel<String> fromComboBoxModel;
     private JComboBox<String> toComboBox;
@@ -26,13 +28,10 @@ public class Application extends JFrame {
 
     private void createUIComponents() {
         currencies = new Currencies(new ArrayList<>());
-        try {
-            URL jsonUrl = new URL("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");
-            currencies = new Currencies(Requests.getCurrencies(jsonUrl));
-            currencies.sortByCC();
-        } catch (IOException exception) {
-            JOptionPane.showMessageDialog(null, "Cannot get currencies info...", "Request error", JOptionPane.ERROR_MESSAGE);
-        }
+
+        refreshButton = new JButton("REFRESH CURRENCIES INFO");
+
+        getCurrenciesInfo();
 
         fromComboBoxModel = new DefaultComboBoxModel<>();
         toComboBoxModel = new DefaultComboBoxModel<>();
@@ -45,6 +44,17 @@ public class Application extends JFrame {
         toComboBox = new JComboBox<>(toComboBoxModel);
 
         calculateButton = new JButton("=");
+    }
+
+    private void getCurrenciesInfo() {
+        try {
+            URL jsonUrl = new URL("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");
+            currencies = new Currencies(Requests.getCurrencies(jsonUrl));
+            currencies.sortByCC();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Cannot get currencies info...", "Request error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void addButtonActions() {
@@ -62,6 +72,8 @@ public class Application extends JFrame {
                 JOptionPane.showMessageDialog(null, "Enter correct value!", "Incorrect value error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        refreshButton.addActionListener(event -> getCurrenciesInfo());
     }
 
     public static void main(String[] args) {
