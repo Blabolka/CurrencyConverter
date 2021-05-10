@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class Application extends JFrame {
 
@@ -27,34 +26,39 @@ public class Application extends JFrame {
     }
 
     private void createUIComponents() {
-        currencies = new Currencies(new ArrayList<>());
-
         refreshButton = new JButton("REFRESH CURRENCIES INFO");
 
-        getCurrenciesInfo();
+        refreshCurrenciesInfo();
 
+        fromComboBox = new JComboBox<>();
+        toComboBox = new JComboBox<>();
+        refreshComboBoxes();
+
+        calculateButton = new JButton("=");
+    }
+
+    private void refreshCurrenciesInfo() {
+        try {
+            URL jsonUrl = new URL("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");
+            currencies = new Currencies(Requests.getCurrencies(jsonUrl));
+            currencies.sortByCC();
+        } catch (IOException exception) {
+            currencies = new Currencies();
+            JOptionPane.showMessageDialog(null, "Cannot get currencies info...", "Request error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void refreshComboBoxes() {
         fromComboBoxModel = new DefaultComboBoxModel<>();
         toComboBoxModel = new DefaultComboBoxModel<>();
         for (CurrencyItem item : currencies.getCurrencies()) {
             fromComboBoxModel.addElement(item.getCc() + " (" + item.getTxt() + ")");
             toComboBoxModel.addElement(item.getCc() + " (" + item.getTxt() + ")");
         }
-
-        fromComboBox = new JComboBox<>(fromComboBoxModel);
-        toComboBox = new JComboBox<>(toComboBoxModel);
-
-        calculateButton = new JButton("=");
-    }
-
-    private void getCurrenciesInfo() {
-        try {
-            URL jsonUrl = new URL("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");
-            currencies = new Currencies(Requests.getCurrencies(jsonUrl));
-            currencies.sortByCC();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Cannot get currencies info...", "Request error", JOptionPane.ERROR_MESSAGE);
-        }
+        fromComboBox.removeAllItems();
+        fromComboBox.setModel(fromComboBoxModel);
+        toComboBox.removeAllItems();
+        toComboBox.setModel(toComboBoxModel);
     }
 
     private void addButtonActions() {
@@ -73,7 +77,10 @@ public class Application extends JFrame {
             }
         });
 
-        refreshButton.addActionListener(event -> getCurrenciesInfo());
+        refreshButton.addActionListener(event -> {
+            refreshCurrenciesInfo();
+            refreshComboBoxes();
+        });
     }
 
     public static void main(String[] args) {

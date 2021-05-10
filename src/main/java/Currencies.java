@@ -7,7 +7,14 @@ public class Currencies {
 
     public Currencies(List<CurrencyItem> currencies) {
         this.currencies = new ArrayList<>(currencies);
+        addDefaultCurrency();
+    }
 
+    public Currencies() {
+        this(new ArrayList<>());
+    }
+
+    private void addDefaultCurrency() {
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         currencies.add(new CurrencyItem(1, "Українська гривня", 1, "UAN", formatter.format(new Date())));
     }
