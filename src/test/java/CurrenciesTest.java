@@ -1,3 +1,5 @@
+import currencies.Currencies;
+import currencies.CurrencyItem;
 import org.junit.Assert;
 import org.junit.Test;
 

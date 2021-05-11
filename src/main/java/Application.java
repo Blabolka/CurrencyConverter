@@ -1,7 +1,13 @@
+import currencies.Currencies;
+import gui.ComboBoxesPanel;
+import gui.DocumentInputListener;
+import gui.InputFieldsPanel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 
 public class Application extends JFrame {
 
@@ -9,18 +15,13 @@ public class Application extends JFrame {
 
     private JPanel contentPane;
     private JButton refreshButton;
-    private JComboBox<String> fromComboBox;
-    private DefaultComboBoxModel<String> fromComboBoxModel;
-    private JComboBox<String> toComboBox;
-    private DefaultComboBoxModel<String> toComboBoxModel;
-    private JButton calculateButton;
-    private JTextField fromValueTextField;
-    private JTextField toValueTextField;
+    private ComboBoxesPanel comboBoxesPanel;
+    private InputFieldsPanel inputFieldsPanel;
 
     public Application(String title) {
         super(title);
 
-        addButtonActions();
+        addGUIElementsAction();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(contentPane);
     }
@@ -28,13 +29,48 @@ public class Application extends JFrame {
     private void createUIComponents() {
         refreshButton = new JButton("REFRESH CURRENCIES INFO");
 
+        inputFieldsPanel = new InputFieldsPanel();
+
         refreshCurrenciesInfo();
 
-        fromComboBox = new JComboBox<>();
-        toComboBox = new JComboBox<>();
-        refreshComboBoxes();
+        comboBoxesPanel = new ComboBoxesPanel();
+        comboBoxesPanel.refreshComboBoxes(currencies);
+    }
 
-        calculateButton = new JButton("=");
+    private void addGUIElementsAction() {
+        refreshButton.addActionListener(event -> {
+            refreshCurrenciesInfo();
+            comboBoxesPanel.refreshComboBoxes(currencies);
+        });
+
+        comboBoxesPanel.getFromComboBox().addItemListener(event -> convertCurrencies());
+        comboBoxesPanel.getToComboBox().addItemListener(event -> convertCurrencies());
+
+        inputFieldsPanel.getFromTextField().getDocument().addDocumentListener((DocumentInputListener) event -> convertCurrencies());
+
+        inputFieldsPanel.getSwapButton().addActionListener(event -> {
+            comboBoxesPanel.swapSelectedItemsInComboBox();
+            inputFieldsPanel.swapTextInTextFields();
+            convertCurrencies();
+        });
+    }
+
+    private void convertCurrencies() throws NumberFormatException {
+        int indexFrom = comboBoxesPanel.getFromComboBoxModel().getIndexOf(comboBoxesPanel.getFromComboBoxModel().getSelectedItem());
+        int indexTo = comboBoxesPanel.getToComboBoxModel().getIndexOf(comboBoxesPanel.getToComboBoxModel().getSelectedItem());
+
+        if (!inputFieldsPanel.getFromTextField().getText().equals("")) {
+            try {
+                double convertibleValue = Double.parseDouble(inputFieldsPanel.getFromTextField().getText());
+                double convertedValue = currencies.convertCurrency(indexFrom, indexTo, convertibleValue);
+                inputFieldsPanel.getToTextField().setText(String.format("%.4f", convertedValue));
+            } catch (NumberFormatException ignore) {
+                inputFieldsPanel.getToTextField().setText("");
+            }
+
+        } else {
+            inputFieldsPanel.getToTextField().setText("");
+        }
     }
 
     private void refreshCurrenciesInfo() {
@@ -48,42 +84,8 @@ public class Application extends JFrame {
         }
     }
 
-    private void refreshComboBoxes() {
-        fromComboBoxModel = new DefaultComboBoxModel<>();
-        toComboBoxModel = new DefaultComboBoxModel<>();
-        for (CurrencyItem item : currencies.getCurrencies()) {
-            fromComboBoxModel.addElement(item.getCc() + " (" + item.getTxt() + ")");
-            toComboBoxModel.addElement(item.getCc() + " (" + item.getTxt() + ")");
-        }
-        fromComboBox.removeAllItems();
-        fromComboBox.setModel(fromComboBoxModel);
-        toComboBox.removeAllItems();
-        toComboBox.setModel(toComboBoxModel);
-    }
-
-    private void addButtonActions() {
-        calculateButton.addActionListener(event -> {
-            int indexFrom = fromComboBoxModel.getIndexOf(fromComboBoxModel.getSelectedItem());
-            int indexTo = toComboBoxModel.getIndexOf(toComboBoxModel.getSelectedItem());
-
-            try {
-                if (!fromValueTextField.getText().equals("")) {
-                    double convertibleValue = Double.parseDouble(fromValueTextField.getText());
-                    double convertedValue = currencies.convertCurrency(indexFrom, indexTo, convertibleValue);
-                    toValueTextField.setText(String.format("%.4f", convertedValue));
-                }
-            } catch (NumberFormatException exception) {
-                JOptionPane.showMessageDialog(null, "Enter correct value!", "Incorrect value error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        refreshButton.addActionListener(event -> {
-            refreshCurrenciesInfo();
-            refreshComboBoxes();
-        });
-    }
-
     public static void main(String[] args) {
+        Locale.setDefault(Locale.US);
         JFrame frame = new Application("Andrew's Klochko Currency Converter");
         frame.pack();
 

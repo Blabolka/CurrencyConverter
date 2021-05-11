@@ -1,3 +1,5 @@
+package currencies;
+
 import java.util.Objects;
 
 public class CurrencyItem {
@@ -88,7 +90,7 @@ public class CurrencyItem {
 
     @Override
     public String toString() {
-        return "CurrencyItem{" +
+        return "currencies.CurrencyItem{" +
                 "r030=" + r030 +
                 ", txt='" + txt + '\'' +
                 ", rate=" + rate +

@@ -1,3 +1,5 @@
+package currencies;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,7 +53,7 @@ public class Currencies {
 
     @Override
     public String toString() {
-        return "Currencies{" +
+        return "currencies.Currencies{" +
                 "currencies=" + currencies +
                 '}';
     }
