@@ -25,10 +25,4 @@ public class InputFieldsPanel extends JComponent {
     public JButton getSwapButton() {
         return swapButton;
     }
-
-    public void swapTextInTextFields() {
-        String tempText = fromTextField.getText();
-        fromTextField.setText(toTextField.getText());
-        toTextField.setText(tempText);
-    }
 }

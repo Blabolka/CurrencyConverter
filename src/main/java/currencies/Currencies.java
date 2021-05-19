@@ -1,5 +1,6 @@
 package currencies;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -18,7 +19,7 @@ public class Currencies {
 
     private void addDefaultCurrency() {
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        currencies.add(new CurrencyItem(1, "Українська гривня", 1, "UAN", formatter.format(new Date())));
+        currencies.add(new CurrencyItem(1, "Українська гривня", 1, "UAH", formatter.format(new Date())));
     }
 
     public List<CurrencyItem> getCurrencies() {
@@ -33,9 +34,9 @@ public class Currencies {
         currencies.sort(Comparator.comparing(CurrencyItem::getTxt));
     }
 
-    public double convertCurrency(int fromCurrencyIndex, int toCurrencyIndex, double convertedValue) {
+    public BigDecimal convertCurrency(int fromCurrencyIndex, int toCurrencyIndex, BigDecimal convertedValue) {
         double coefficient = currencies.get(fromCurrencyIndex).getRate() / currencies.get(toCurrencyIndex).getRate();
-        return convertedValue * coefficient;
+        return convertedValue.multiply(BigDecimal.valueOf(coefficient));
     }
 
     @Override

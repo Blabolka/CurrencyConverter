@@ -6,6 +6,7 @@ import gui.InputFieldsPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Locale;
 
@@ -50,19 +51,18 @@ public class Application extends JFrame {
 
         inputFieldsPanel.getSwapButton().addActionListener(event -> {
             comboBoxesPanel.swapSelectedItemsInComboBox();
-            inputFieldsPanel.swapTextInTextFields();
             convertCurrencies();
         });
     }
 
     private void convertCurrencies() throws NumberFormatException {
-        int indexFrom = comboBoxesPanel.getFromComboBoxModel().getIndexOf(comboBoxesPanel.getFromComboBoxModel().getSelectedItem());
-        int indexTo = comboBoxesPanel.getToComboBoxModel().getIndexOf(comboBoxesPanel.getToComboBoxModel().getSelectedItem());
+        int indexCurrencyFrom = comboBoxesPanel.getFromComboBoxModel().getIndexOf(comboBoxesPanel.getFromComboBoxModel().getSelectedItem());
+        int indexCurrencyTo = comboBoxesPanel.getToComboBoxModel().getIndexOf(comboBoxesPanel.getToComboBoxModel().getSelectedItem());
 
         if (!inputFieldsPanel.getFromTextField().getText().equals("")) {
             try {
-                double convertibleValue = Double.parseDouble(inputFieldsPanel.getFromTextField().getText());
-                double convertedValue = currencies.convertCurrency(indexFrom, indexTo, convertibleValue);
+                BigDecimal convertibleValue = new BigDecimal(inputFieldsPanel.getFromTextField().getText());
+                BigDecimal convertedValue = currencies.convertCurrency(indexCurrencyFrom, indexCurrencyTo, convertibleValue);
                 inputFieldsPanel.getToTextField().setText(String.format("%.4f", convertedValue));
             } catch (NumberFormatException ignore) {
                 inputFieldsPanel.getToTextField().setText("");
